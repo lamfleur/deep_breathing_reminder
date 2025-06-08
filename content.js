@@ -1,6 +1,6 @@
 const DEFAULT_OPTIONS = {
-  displayTime: 1500,
-  minInterval: 30000,
+  displayTime: 2000,
+  minInterval: 60000,
   message: '深呼吸しましょう'
 };
 

@@ -12,6 +12,12 @@
       "run_at": "document_idle"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["style/popup.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "options_page": "options/options.html",
   "icons": {
     "16": "assets/icon16.png",

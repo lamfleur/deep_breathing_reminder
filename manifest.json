@@ -2,15 +2,19 @@
   "manifest_version": 3,
   "name": "深呼吸リマインダー",
   "description": "入力時に深呼吸を促すポップアップを表示します。",
-  "version": "0.1.0",
-  "permissions": ["storage"],
-  "host_permissions": ["<all_urls>"],
+  "version": "0.1.1",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"],
       "run_at": "document_idle",
-      "type": "module"
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [

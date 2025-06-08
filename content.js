@@ -1,24 +1,14 @@
-// content.js - listens for input and shows breathing reminder popup
-// @ts-check
-/* global chrome */
-
-export const DEFAULT_OPTIONS = {
-  displayTime: 2000,
-  minInterval: 60000,
-  message: '深呼吸しましょう',
+const DEFAULT_OPTIONS = {
+  displayTime: 1500,
+  minInterval: 30000,
+  message: '深呼吸しましょう'
 };
 
-/** @type {typeof DEFAULT_OPTIONS} */
 let options = { ...DEFAULT_OPTIONS };
-
-/** Timestamp of last popup display */
 let lastShown = 0;
+let isComposing = false;
 
-/**
- * Create popup element.
- * @returns {HTMLDivElement}
- */
-export function createPopup() {
+function createPopup() {
   const popup = document.createElement('div');
   popup.className = 'deep-breathing-popup';
   popup.textContent = options.message;
@@ -35,10 +25,7 @@ function ensureStyles() {
   document.head.appendChild(link);
 }
 
-/**
- * Show popup if minimum interval has passed.
- */
-export function showPopup() {
+function showPopup() {
   const now = Date.now();
   if (now - lastShown < options.minInterval) return;
   lastShown = now;
@@ -52,24 +39,22 @@ export function showPopup() {
   setTimeout(() => {
     popup.classList.remove('show');
     popup.classList.add('fade-out');
-    popup.addEventListener(
-      'transitionend',
-      () => popup.remove(),
-      { once: true },
-    );
+    popup.addEventListener('transitionend', () => popup.remove(), { once: true });
   }, options.displayTime);
 }
 
-/**
- * Determine whether the event target should trigger the popup.
- * @param {EventTarget|null} target
- * @returns {boolean}
- */
-export function shouldTrigger(target) {
+function isEditable(target) {
   if (!(target instanceof Element)) return false;
   const tag = target.tagName.toLowerCase();
   if (tag === 'input' || tag === 'textarea') return true;
-  return target.closest('[contenteditable="true"]') !== null;
+  if (target.isContentEditable) return true;
+  if ((target.getAttribute('role') || '').toLowerCase() === 'textbox') return true;
+  const aria = (target.getAttribute('aria-label') || '').toLowerCase();
+  if (aria.includes('編集') || aria.includes('edit')) return true;
+  if (target.hasAttribute('tabindex') && getComputedStyle(target).userSelect !== 'none') return true;
+  const cls = (target.className || '').toString().toLowerCase();
+  if (cls.includes('input') || cls.includes('editor') || cls.includes('notebook')) return true;
+  return false;
 }
 
 function loadOptions() {
@@ -77,19 +62,36 @@ function loadOptions() {
     options = {
       displayTime: Number(items.displayTime) || DEFAULT_OPTIONS.displayTime,
       minInterval: Number(items.minInterval) || DEFAULT_OPTIONS.minInterval,
-      message: String(items.message || DEFAULT_OPTIONS.message),
+      message: String(items.message || DEFAULT_OPTIONS.message)
     };
   });
 }
 
-export function init() {
+function init() {
   loadOptions();
   ensureStyles();
+
+  document.addEventListener('compositionstart', () => { isComposing = true; });
+  document.addEventListener('compositionend', () => { isComposing = false; });
+
   document.addEventListener('keydown', (e) => {
-    if (shouldTrigger(e.target)) {
-      showPopup();
-    }
+    if (isComposing) return;
+    if (!isEditable(e.target)) return;
+
+    // 除外するキー（文字入力にならないもの）
+    const ignoreKeys = [
+      'Shift', 'Control', 'Alt', 'Meta', 'Tab', 'Escape',
+      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'CapsLock', 'PageUp', 'PageDown', 'Home', 'End', 'Insert', 'Delete',
+      'ContextMenu', 'NumLock', 'ScrollLock', 'Pause', 'PrintScreen'
+    ];
+    // F1-F12キーも除外
+    if (/^F\d{1,2}$/.test(e.key)) return;
+    if (ignoreKeys.includes(e.key)) return;
+
+    showPopup();
   });
+
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'sync') return;
     if (changes.displayTime) options.displayTime = Number(changes.displayTime.newValue);
@@ -97,6 +99,5 @@ export function init() {
     if (changes.message) options.message = String(changes.message.newValue);
   });
 }
-if (typeof chrome !== 'undefined' && chrome.runtime && !globalThis.__JEST__) {
-  init();
-}
+
+init();

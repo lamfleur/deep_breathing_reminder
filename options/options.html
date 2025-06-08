@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>深呼吸リマインダー 設定</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <h1>設定</h1>
+    <form id="options-form">
+      <label>
+        ポップアップ表示時間 (ms):
+        <input type="number" id="displayTime" min="500" max="10000" />
+      </label>
+      <br />
+      <label>
+        再表示までの最小間隔 (ms):
+        <input type="number" id="minInterval" min="5000" max="600000" />
+      </label>
+      <br />
+      <label>
+        表示テキスト:
+        <input type="text" id="message" />
+      </label>
+    </form>
+    <script src="options.js" type="module"></script>
+  </body>
+</html>

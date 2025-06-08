@@ -3,6 +3,7 @@
   right: 24px;
   bottom: 24px;
   background: rgba(255, 255, 255, 0.95);
+  color: #222;
   border: 2px solid #6ae;
   border-radius: 24px;
   padding: 1rem 2rem;
@@ -20,4 +21,14 @@
 
 .deep-breathing-popup.fade-out {
   opacity: 0;
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .deep-breathing-popup {
+    background: rgba(28, 28, 28, 0.98); /* 暗めの背景 */
+    color: #fafaff; /* 明るい文字 */
+    border-color: #57b8ff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  }
 }

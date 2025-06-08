@@ -1,0 +1,17 @@
+{
+  "name": "deep-breathing-reminder",
+  "version": "0.1.0",
+  "description": "Edge extension that reminds you to take deep breaths.",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.0",
+    "jest": "^29.6.0",
+    "jest-environment-jsdom": "^30.0.0-beta.3"
+  }
+}
